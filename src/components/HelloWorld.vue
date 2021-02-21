@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<form class="root" @submit.prevent="submited">
+		<form class="root" @submit.prevent="submited" v-if="!validateForm">
 			<div class="email">
 				<label for="email">email</label>
 				<input
@@ -62,17 +62,21 @@
 
 			<button type="submit">log</button>
 		</form>
+		<Reg :email="form.email" v-else />
 	</div>
 </template>
 
 <script>
+	import Reg from './reg'
 	import { validationMixin } from 'vuelidate'
 	import { required, minLength, email } from 'vuelidate/lib/validators'
 	export default {
 		mixins: [validationMixin],
 		name: 'helloWorld',
+		components: { Reg },
 		data() {
 			return {
+				validateForm: false,
 				form: {
 					email: '',
 					password: '',
@@ -110,6 +114,10 @@
 		methods: {
 			submited() {
 				this.$v.form.$touch()
+				if (!this.$v.form.$error) {
+					console.log('+')
+					this.validateForm = true
+				}
 			},
 		},
 		validations: {
