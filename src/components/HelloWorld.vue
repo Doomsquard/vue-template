@@ -1,148 +1,149 @@
 <template>
-	<div class="root">
-		<div class="img">
-			<img
-				v-if="showImage"
-				src="../assets/img/aIdDy6e2Bdg.jpg"
-				:style="currentImageSize"
-				:class="filterImg"
-			/>
-			<p v-else>come back soon</p>
-		</div>
-		<form>
-			<label for="rangeHeight">height:{{ sizeImage.currentHeight }}</label>
-			<input
-				type="range"
-				:min="sizeImage.minHeight"
-				id="rangeHeight"
-				:max="sizeImage.maxHeight"
-				:value="sizeImage.currentHeight"
-				@input="sizeImage.currentHeight = $event.target.value"
-			/>
+	<div>
+		<form class="root" @submit.prevent="submited">
+			<div class="email">
+				<label for="email">email</label>
+				<input
+					type="email"
+					:class="$v.form.email.$error ? 'error' : ''"
+					id="email"
+					v-model.trim="form.email"
+				/>
+			</div>
+			<div class="password">
+				<label for="password">password</label>
+				<input
+					v-model.trim="form.password"
+					:class="$v.form.password.$error ? 'error' : ''"
+					id="password"
+					type="password"
+				/>
+				<p v-if="$v.form.password.$dirty && !$v.form.password.required">
+					Обязательное поле
+				</p>
+			</div>
+			<div class="checkbox">
+				<label for="checkbox">save password</label>
+				<input
+					v-model="form.checkbox"
+					:class="$v.form.checkbox.$error ? 'error' : ''"
+					id="checkbox"
+					type="checkbox"
+				/>
+			</div>
+			<div class="radio">
+				<label for="male">male</label>
+				<input type="radio" id="male" v-model="form.radio" value="male" />
+				<label for="female">female</label>
+				<input type="radio" id="female" v-model="form.radio" value="female" />
+			</div>
+			<div class="list">
+				<label for="country">country</label>
+				<select id="country" v-model="form.currentCountry">
+					<option
+						v-for="(country, index) in form.country"
+						:key="index"
+						:value="country.value"
+						>{{ country.label }}</option
+					>
+				</select>
+			</div>
+			<div class="multiple">
+				<label for="multiple">select fav themes</label>
+				<select id="multiple" v-model="form.favTheme" multiple>
+					<option
+						v-for="(theme, index) in form.themes"
+						:value="theme.value"
+						:key="index"
+						>{{ theme.label }}</option
+					>
+				</select>
+			</div>
+
+			<button type="submit">log</button>
 		</form>
-		<form>
-			<label for="rangeWidth">width:{{ sizeImage.currentWidth }}</label>
-			<input
-				type="range"
-				:min="sizeImage.minWidth"
-				id="rangeWidth"
-				:max="sizeImage.maxWidth"
-				:value="sizeImage.currentWidth"
-				@input="sizeImage.currentWidth = $event.target.value"
-			/>
-		</form>
-		<form>
-			<label for="rotate">rotate:{{ sizeImage.rotate.currentDeg }}</label>
-			<input
-				type="range"
-				:min="sizeImage.rotate.minDeg"
-				id="rotate"
-				:max="sizeImage.rotate.maxDeg"
-				:value="sizeImage.rotate.currentDeg"
-				@input="sizeImage.rotate.currentDeg = $event.target.value"
-			/>
-		</form>
-		<button @click="showImage = !showImage">{{ buttonMsg }}</button>
-		<div class="filters">
-			<h2>Фильтры</h2>
-			<button
-				@click="filterImg.sepia = !filterImg.sepia"
-				:class="filterImg.sepia ? 'active' : ''"
-			>
-				Сепия
-			</button>
-			<button
-				@click="filterImg.blur = !filterImg.blur"
-				:class="filterImg.blur ? 'active' : ''"
-			>
-				Размытие
-			</button>
-			<button
-				@click="filterImg.shadows = !filterImg.shadows"
-				:class="filterImg.shadows ? 'active' : ''"
-			>
-				Тени
-			</button>
-			<button
-				@click="filterImg.border = !filterImg.border"
-				:class="filterImg.border ? 'active' : ''"
-			>
-				Рамка
-			</button>
-		</div>
 	</div>
 </template>
 
 <script>
+	import { validationMixin } from 'vuelidate'
+	import { required, minLength, email } from 'vuelidate/lib/validators'
 	export default {
-		name: 'HelloWorld',
+		mixins: [validationMixin],
+		name: 'helloWorld',
 		data() {
 			return {
-				showImage: true,
-				sizeImage: {
-					minHeight: 300,
-					maxHeight: 500,
-					minWidth: 300,
-					maxWidth: 500,
-					currentHeight: 500,
-					currentWidth: 500,
-					rotate: {
-						minDeg: 0,
-						maxDeg: 360,
-						currentDeg: 0,
-					},
-				},
-				filterImg: {
-					sepia: false,
-					blur: false,
-					shadows: false,
-					border: false,
+				form: {
+					email: '',
+					password: '',
+					checkbox: false,
+					radio: 'male',
+					favTheme: ['IT'],
+					themes: [
+						{
+							label: 'IT',
+							value: 'IT',
+						},
+						{
+							label: 'BOOK',
+							value: 'BOOk',
+						},
+					],
+					currentCountry: 'Russia',
+					country: [
+						{
+							label: 'Russia',
+							value: 'RUS',
+						},
+						{
+							label: 'Ucraine',
+							value: 'UC',
+						},
+						{
+							label: 'USA',
+							value: 'USA',
+						},
+					],
 				},
 			}
 		},
-		computed: {
-			currentImageSize: function() {
-				return {
-					height: `${this.sizeImage.currentHeight}px`,
-					width: `${this.sizeImage.currentWidth}px`,
-					transform: `rotate(${this.sizeImage.rotate.currentDeg}deg)`,
-				}
+		methods: {
+			submited() {
+				this.$v.form.$touch()
 			},
-			buttonMsg: function() {
-				return this.showImage ? 'Скрыть' : 'Показать'
+		},
+		validations: {
+			form: {
+				email: {
+					required,
+					email,
+				},
+				password: {
+					minLength: minLength(5),
+					required,
+				},
+				checkbox: {
+					req() {
+						return this.$v.form.checkbox.$model ? true : false
+					},
+				},
 			},
 		},
 	}
 </script>
 
 <style scoped>
-	.img {
-		min-width: 500px;
-		min-height: 500px;
-	}
-	button {
-		min-height: 30px;
-		min-width: 100px;
-	}
-	.filters {
+	.root {
 		display: flex;
-		padding: 10px;
 		align-items: center;
-		justify-content: center;
+		justify-items: center;
+		flex-direction: column;
 	}
-	.sepia {
-		filter: sepia(60%);
+	label {
+		margin: 10px;
+		width: 100px;
 	}
-	.blur {
-		filter: blur(10px);
-	}
-	.shadows {
-		box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.5);
-	}
-	.border {
-		border: 4px solid black;
-	}
-	.active {
-		background-color: grey;
+	.error {
+		border: 1px solid red;
 	}
 </style>
