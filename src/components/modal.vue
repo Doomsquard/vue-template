@@ -39,6 +39,8 @@
 				</div>
 			</div>
 		</div>
+		<input v-model="inputValue" />
+		<h1>{{ inputValue | upperCase }}</h1>
 	</div>
 </template>
 
@@ -47,24 +49,30 @@
 		name: 'Modal',
 		data() {
 			return {
+				inputValue: '',
 				buttonDisable: true,
 			}
 		},
 		methods: {
 			close() {
 				this.$emit('close')
-				this.$refs
 			},
-			onBodyScroll() {
-				const modal = this.$refs.modalBody
-				if (modal.clientHeight + modal.scrollTop + 20 >= modal.scrollHeight) {
-					this.buttonDisable = false
-				}
+
+			addSomeMethod() {
+				console.log('method is add')
+			},
+		},
+		filters: {
+			upperCase(value) {
+				return value.toUpperCase()
 			},
 		},
 		mounted() {
 			const modal = this.$refs.modalBody
 			modal.scrollTop = modal.scrollHeight - modal.clientHeight
+		},
+		created() {
+			console.log(this.$logger())
 		},
 	}
 </script>
