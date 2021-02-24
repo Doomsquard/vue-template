@@ -19,12 +19,18 @@
 				<p class="section__title">Режисеры:</p>
 				<p class="section__description">{{ film.directors.join(', ') }}</p>
 			</div>
+			<div class="reaction">
+				<button v-for="(reaction, index) in loadState" :key="index + reaction">
+					{{ reaction.title }}
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
 
 <script>
 	import films from '../mocks/films'
+	import { mapGetters, mapActions } from 'vuex'
 	export default {
 		name: 'filmPage',
 		data() {
@@ -32,11 +38,29 @@
 				film: null,
 			}
 		},
+		methods: {
+			...mapActions({
+				loadReactions: 'reactions/loadDataAction',
+			}),
+		},
+		computed: {
+			...mapGetters({
+				getReactions: 'reactions/getState',
+			}),
+			loadState() {
+				return this.getReactions
+			},
+		},
+
 		created() {
 			const film = films.find((i) => i.id === this.$route.params.id)
 			if (film) {
 				this.film = film
 			}
+			this.loadReactions(1000)
+		},
+		mounted() {
+			console.log(this.loadState)
 		},
 	}
 </script>
@@ -84,5 +108,9 @@
 				line-height: 30px;
 			}
 		}
+	}
+	.reaction {
+		display: flex;
+		margin: 10px;
 	}
 </style>
